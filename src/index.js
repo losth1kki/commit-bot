@@ -10,7 +10,7 @@ const github_token = process.env.GITHUB_TOKEN;
 const owner = process.env.GITHUB_OWNER;
 const repo = process.env.GITHUB_REPO;
 
-async function sendTelegramMessage(chat_id, message) {
+function sendTelegramMessage(chat_id, message) {
 	const url = `https://api.telegram.org/bot${telegram_token}/sendMessage`
 	axios.post(url, {
 		chat_id,
@@ -21,7 +21,6 @@ async function sendTelegramMessage(chat_id, message) {
 		console.log('Ошибка при отправке сообщения:', error);
 	});
 };
-
 
 async function getCommitsForCurrentMinute() {
 	const startTime = moment().subtract(1, 'minute').startOf('minute').toISOString();
