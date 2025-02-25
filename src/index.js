@@ -6,6 +6,7 @@ require('dotenv').config();
 
 const telegram_token = process.env.TELEGRAM_TOKEN;
 const telegram_chat_id = process.env.TELEGRAM_CHAT_ID;
+const thread_id = process.env.TELEGRAM_THREAD_ID;
 const github_token = process.env.GITHUB_TOKEN;
 const owner = process.env.GITHUB_OWNER;
 const repo = process.env.GITHUB_REPO;
@@ -15,6 +16,7 @@ function sendTelegramMessage(chat_id, message) {
 	axios.post(url, {
 		chat_id,
 		text: message,
+		message_thread_id: thread_id,
 		parse_mode: 'Markdown'
 	})
 	.catch(error => {
