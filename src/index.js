@@ -17,7 +17,8 @@ function sendTelegramMessage(chat_id, message) {
 		chat_id,
 		text: message,
 		message_thread_id: thread_id,
-		parse_mode: 'Markdown'
+		parse_mode: 'Markdown',
+		disable_web_page_preview: true
 	})
 	.catch(error => {
 		console.log('Ошибка при отправке сообщения:', error);
@@ -46,12 +47,17 @@ async function getCommitsForCurrentMinute() {
 
 			response.data.forEach(commit => {
 				const author = commit.committer.login;
+				const profileUrl = `https://github.com/${author}`;
+				const commitUrl = commit.html_url;
+				const commitSha = commit.sha.substring(0, 7);
 				const date = moment(commit.commit.committer.date).format('YYYY-MM-DD HH:mm:ss');
 				const commitMessage = commit.commit.message;
 
-				message += `👤 *Автор:* ${author}\n`;
+				message += `👤 *Автор:* [${author}](${profileUrl})\n`;
 				message += `📅 *Дата:* ${date}\n`;
 				message += `💬 *Сообщение:* ${commitMessage}\n`;
+				message += `🔗 [Ссылка на коммит](${commitUrl})\n`;
+				message += `🔑 SHA: *${commitSha}*\n`
 				message += '\n';
 			});
 
