@@ -43,26 +43,46 @@ async function getCommitsForCurrentMinute() {
 		});
 
 		if (response.data && response.data.length > 0) {
-			let message = '*🚀 Последние коммиты:*\n\n';
+			let message = '';
+			let commitsByAuthorAndRepo = {};
 
 			response.data.forEach(commit => {
 				const author = commit.committer.login;
 				const profileUrl = `https://github.com/${author}`;
-				const commitUrl = commit.html_url;
 				const commitSha = commit.sha.substring(0, 7);
-				const date = moment(commit.commit.committer.date).format('YYYY-MM-DD HH:mm:ss');
 				const commitMessage = commit.commit.message;
+				const commitUrl = commit.html_url;
+				const repoName = repo;
 
-				message += `👤 *Автор:* [${author}](${profileUrl})\n`;
-				message += `📅 *Дата:* ${date}\n`;
-				message += `💬 *Сообщение:* ${commitMessage}\n`;
-				message += `🔗 [Ссылка на коммит](${commitUrl})\n`;
-				message += `🔑 SHA: *${commitSha}*\n`
-				message += '\n';
+				if (!commitsByAuthorAndRepo[author]) {
+					commitsByAuthorAndRepo[author] = { profileUrl, repos: {} };
+				}
+
+				if (!commitsByAuthorAndRepo[author].repos[repoName]) {
+					commitsByAuthorAndRepo[author].repos[repoName] = [];
+				}
+
+				commitsByAuthorAndRepo[author].repos[repoName].push({ commitSha, commitMessage, commitUrl });
 			});
+
+			for (const author in commitsByAuthorAndRepo) {
+				const { profileUrl, repos } = commitsByAuthorAndRepo[author];
+
+				for (const repoName in repos) {
+					const commits = repos[repoName];
+					message += `📦 *[${repoName}]* ${commits.length} коммитов\n`;
+
+					commits.forEach(commit => {
+						message += `🔑 [${commit.commitSha}](${commit.commitUrl}) ${commit.commitMessage} - [${author}](${profileUrl})\n`;
+					});
+
+					message += '\n';
+				}
+			}
 
 			return message;
 		}
+
 	} catch (error) {
 		console.error('Ошибка при получении коммитов:', error);
 	};
